@@ -25,12 +25,11 @@ The model is trained on the **Alzheimer’s Disease Neuroimaging Initiative (ADN
 ### 3. Loss Function  
 The total loss function combines multiple objectives:  
 ```math
-L_{total} = L_{rec} +  \lambda_2 L_{dir} + \lambda_3 L_{cls}
+L_{total} = \lambda_1 L_{rec} +  \lambda_2 L_{dir} 
 ```  
 where:  
 - `L_rec`: Reconstruction loss for autoencoder.  
 - `L_dir`: Directional loss for monotonicity.  
-- `L_cls`: Classification loss for distinguishing CN vs. AD.  
 
 ## Experimental Results  
 - **Violation Ratio & Violation Gap**: SLOPE significantly reduces instances of decreasing risk scores compared to baselines.  
