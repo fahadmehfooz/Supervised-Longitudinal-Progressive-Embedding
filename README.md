@@ -53,18 +53,18 @@ python train.py --dataset path/to/data
 ## Results  
 | Metric | Slope | Slope Without Direction Loss | LNE | Original Data |  
 |--------|--------|----------------------------|------|--------------|  
-| **Logistic Regression** | | | | |  
+| **Logistic Regression** ".center(75, " ") + "| | | | |  
 | F1-Score | **0.841** | 0.800 | 0.814 | 0.771 |  
 | Balanced Accuracy | **0.858** | 0.825 | 0.836 | 0.803 |  
 | ROC-AUC | **0.858** | 0.825 | 0.836 | 0.803 |  
-| **Elastic Net** | | | | |  
+| **Elastic Net** ".center(75, " ") + "| | | | |  
 | F1-Score | **0.841** | 0.814 | 0.822 | 0.776 |  
 | Balanced Accuracy | **0.858** | 0.836 | 0.840 | 0.805 |  
 | ROC-AUC | **0.858** | 0.836 | 0.840 | 0.805 |  
-| **MLP** | | | | |  
+| **MLP** ".center(75, " ") + "| | | | |  
 | F1-Score | **0.814** | 0.786 | 0.805 | 0.750 |  
 | Balanced Accuracy | **0.836** | 0.814 | 0.827 | 0.790 |  
-| ROC-AUC | **0.836** | 0.814 | 0.827 | 0.790 | 
+| ROC-AUC | **0.836** | 0.814 | 0.827 | 0.790 |  
 
 ## Conclusion  
 SLOPE provides a robust approach to modeling Alzheimer’s Disease progression, ensuring monotonic risk predictions and improving classification accuracy. This method is applicable to any longitudinal disease modeling task requiring structured progression trajectories.
