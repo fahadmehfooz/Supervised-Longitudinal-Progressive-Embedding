@@ -51,37 +51,20 @@ python train.py --dataset path/to/data
 ```  
 
 ## Results  
-```latex
-\begin{table}[H]
-\centering
-\setlength{\tabcolsep}{3pt} % Adjust column spacing
-\scriptsize % Reduce font size
-\begin{tabular}{|l|l|l|l|l|}
-\hline
-\textbf{Metric} & \textbf{Slope} & \textbf{Slope Without Direction Loss} & \textbf{LNE} & \textbf{Original Data} \\
-\hline
- & \multicolumn{4}{c|}{\textbf{Logistic Regression}} \\
-\hline
-F1-Score & \textbf{0.841} & 0.800 & 0.814 & 0.771 \\
-Balanced Accuracy & \textbf{0.858} & 0.825 & 0.836 & 0.803 \\
-ROC-AUC & \textbf{0.858} & 0.825 & 0.836 & 0.803 \\
-\hline
- & \multicolumn{4}{c|}{\textbf{Elastic Net}} \\
-\hline
-F1-Score & \textbf{0.841} & 0.814 & 0.822 & 0.776 \\
-Balanced Accuracy & \textbf{0.858} & 0.836 & 0.840 & 0.805 \\
-ROC-AUC & \textbf{0.858} & 0.836 & 0.840 & 0.805 \\
-\hline
- & \multicolumn{4}{c|}{\textbf{MLP}} \\
-\hline
-F1-Score & \textbf{0.814} & 0.786 & 0.805 & 0.750 \\
-Balanced Accuracy & \textbf{0.836} & 0.814 & 0.827 & 0.790 \\
-ROC-AUC & \textbf{0.836} & 0.814 & 0.827 & 0.790 \\
-\hline
-\end{tabular}
-\caption{Results for CN vs AD classification across preprocessing methods and classifiers.}
-\label{tab:cn_vs_ad_transposed}
-\end{table}
-```  
+| Metric | Slope | Slope Without Direction Loss | LNE | Original Data |  
+|--------|--------|----------------------------|------|--------------|  
+| **Logistic Regression** | | | | |  
+| F1-Score | **0.841** | 0.800 | 0.814 | 0.771 |  
+| Balanced Accuracy | **0.858** | 0.825 | 0.836 | 0.803 |  
+| ROC-AUC | **0.858** | 0.825 | 0.836 | 0.803 |  
+| **Elastic Net** | | | | |  
+| F1-Score | **0.841** | 0.814 | 0.822 | 0.776 |  
+| Balanced Accuracy | **0.858** | 0.836 | 0.840 | 0.805 |  
+| ROC-AUC | **0.858** | 0.836 | 0.840 | 0.805 |  
+| **MLP** | | | | |  
+| F1-Score | **0.814** | 0.786 | 0.805 | 0.750 |  
+| Balanced Accuracy | **0.836** | 0.814 | 0.827 | 0.790 |  
+| ROC-AUC | **0.836** | 0.814 | 0.827 | 0.790 | 
+
 ## Conclusion  
 SLOPE provides a robust approach to modeling Alzheimer’s Disease progression, ensuring monotonic risk predictions and improving classification accuracy. This method is applicable to any longitudinal disease modeling task requiring structured progression trajectories.
