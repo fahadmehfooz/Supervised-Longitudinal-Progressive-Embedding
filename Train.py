@@ -34,6 +34,7 @@ from statsmodels.regression.linear_model import OLS
 import umap
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, precision_score, recall_score, f1_score, balanced_accuracy_score
+import pickle
 
 
 warnings.filterwarnings("ignore")
@@ -415,7 +416,7 @@ def train_logistic_regression(X_train_tensor, y_train_tensor, X_test_tensor, y_t
     train_df_lr["DXGrp"] = y_train_tensor
     test_df_lr["DXGrp"] = y_test_tensor
 
-    return train_df_lr, test_df_lr
+    return finetuned_lr, train_df_lr, test_df_lr
 
 
 def train_ENet(X_train_tensor, y_train_tensor, X_test_tensor, y_test_tensor, train_data_identifiers, test_data_identifiers, train_data, test_data, plot_subject_progression, compute_violation_ratio_violation_gap):
@@ -486,7 +487,7 @@ def train_ENet(X_train_tensor, y_train_tensor, X_test_tensor, y_test_tensor, tra
     test_df_en["DXGrp"] = y_test_tensor
 
 
-    return train_df_en, test_df_en
+    return finetuned_enet_model, train_df_en, test_df_en
 
 def train_MLP(X_train_tensor, y_train_tensor, X_test_tensor, y_test_tensor,train_data_identifiers, test_data_identifiers, train_data, test_data, plot_subject_progression, compute_violation_ratio_violation_gap, seed=42):
     
@@ -545,7 +546,7 @@ def train_MLP(X_train_tensor, y_train_tensor, X_test_tensor, y_test_tensor,train
     test_df_mlp["DXGrp"] = y_test_tensor.numpy()  
 
 
-    return train_df_mlp, test_df_mlp
+    return mlp_best_model, train_df_mlp, test_df_mlp
 
 
 def count_dropping_subjects(data, rid_col, age_col, pseudotime_col):
@@ -569,3 +570,8 @@ def count_dropping_subjects(data, rid_col, age_col, pseudotime_col):
     repeated_rid_data["Reduced"] = repeated_rid_data.groupby(rid_col)[pseudotime_col].diff().lt(0)
     reducing_rids = repeated_rid_data[repeated_rid_data["Reduced"]][rid_col].unique()
     return len(reducing_rids)
+
+
+def save_pickle_object(filename, model_obj):
+    with open(filename, "wb") as file:
+        pickle.dump(model_obj, file)
