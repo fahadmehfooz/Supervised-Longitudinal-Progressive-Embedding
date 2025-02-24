@@ -51,11 +51,37 @@ python train.py --dataset path/to/data
 ```  
 
 ## Results  
-| Model | F1-Score | Balanced Accuracy | Violation Ratio |  
-|--------|------------|--------------------|-----------------|  
-| SLOPE (w/ Directional Loss) | **0.841** | **0.858** | **Low** |  
-| SLOPE (w/o Directional Loss) | 0.800 | 0.825 | Medium |  
-| Elastic Net | 0.822 | 0.840 | High |  
-
+```latex
+\begin{table}[H]
+\centering
+\setlength{\tabcolsep}{3pt} % Adjust column spacing
+\scriptsize % Reduce font size
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+\textbf{Metric} & \textbf{Slope} & \textbf{Slope Without Direction Loss} & \textbf{LNE} & \textbf{Original Data} \\
+\hline
+ & \multicolumn{4}{c|}{\textbf{Logistic Regression}} \\
+\hline
+F1-Score & \textbf{0.841} & 0.800 & 0.814 & 0.771 \\
+Balanced Accuracy & \textbf{0.858} & 0.825 & 0.836 & 0.803 \\
+ROC-AUC & \textbf{0.858} & 0.825 & 0.836 & 0.803 \\
+\hline
+ & \multicolumn{4}{c|}{\textbf{Elastic Net}} \\
+\hline
+F1-Score & \textbf{0.841} & 0.814 & 0.822 & 0.776 \\
+Balanced Accuracy & \textbf{0.858} & 0.836 & 0.840 & 0.805 \\
+ROC-AUC & \textbf{0.858} & 0.836 & 0.840 & 0.805 \\
+\hline
+ & \multicolumn{4}{c|}{\textbf{MLP}} \\
+\hline
+F1-Score & \textbf{0.814} & 0.786 & 0.805 & 0.750 \\
+Balanced Accuracy & \textbf{0.836} & 0.814 & 0.827 & 0.790 \\
+ROC-AUC & \textbf{0.836} & 0.814 & 0.827 & 0.790 \\
+\hline
+\end{tabular}
+\caption{Results for CN vs AD classification across preprocessing methods and classifiers.}
+\label{tab:cn_vs_ad_transposed}
+\end{table}
+```  
 ## Conclusion  
 SLOPE provides a robust approach to modeling Alzheimer’s Disease progression, ensuring monotonic risk predictions and improving classification accuracy. This method is applicable to any longitudinal disease modeling task requiring structured progression trajectories.
