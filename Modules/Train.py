@@ -60,9 +60,9 @@ def set_global_seed(seed):
     os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':16:8'  
 
 
-class Slope(nn.Module):
+class AE(nn.Module):
     def __init__(self, dims, activation="tanh", dropout=0.0, batch_norm=False):
-        super(Slope, self).__init__()
+        super(AE, self).__init__()
         self.dims = dims  # Store dims for later use
         self.encoder = self.build_layers(dims[:dims.index(min(dims)) + 1], activation, dropout, batch_norm)
         self.decoder = self.build_layers(dims[dims.index(min(dims)):], activation, dropout, batch_norm, reverse=True)
@@ -168,7 +168,7 @@ def initialize_weights(model, seed=42):
 
 
 
-def train_slope(model, train_data, test_data,  X_train_tensor, y_train_tensor, X_test_tensor, y_test_tensor,  train_data_identifiers, test_data_identifiers, criterion, optimizer_class, lr,  epochs=500, lambda_reconstruction = 1.0,
+def train_AE(model, train_data, test_data,  X_train_tensor, y_train_tensor, X_test_tensor, y_test_tensor,  train_data_identifiers, test_data_identifiers, criterion, optimizer_class, lr,  epochs=500, lambda_reconstruction = 1.0,
                        lambda_directional=1.0, directional_loss_enabled = True, continuous_df = None, return_losses=False ):
 
     torch.use_deterministic_algorithms(True)
@@ -300,7 +300,7 @@ def train_slope(model, train_data, test_data,  X_train_tensor, y_train_tensor, X
 
 
 
-def test_slope(model, X_test_tensor, y_test_tensor, test_data_identifiers,  umap_model):
+def test_AE(model, X_test_tensor, y_test_tensor, test_data_identifiers,  umap_model):
     """
     Function to test a trained autoencoder model on the test data, encode the test data, 
     and create embeddings using UMAP (without loss calculations).

@@ -57,66 +57,56 @@ def plot_embedding_results(image_paths, title, figsize):
 
 
 def plot_progression_all_models(figures_and_axes):
-    fig = plt.figure(figsize=(18, 12))
+    fig = plt.figure(figsize=(18, 10))
+    
+    ax1 = plt.subplot2grid((2, 6), (0, 1), colspan=2)  
+    ax2 = plt.subplot2grid((2, 6), (0, 3), colspan=2)  
+    
+    ax3 = plt.subplot2grid((2, 6), (1, 0), colspan=2)  
+    ax4 = plt.subplot2grid((2, 6), (1, 2), colspan=2)  
+    ax5 = plt.subplot2grid((2, 6), (1, 4), colspan=2)  
+    
+    SLOPE_fig, SLOPE_ax = figures_and_axes[0]
 
-    ax1 = plt.subplot2grid((2, 6), (0, 0), colspan=2)
-    ax2 = plt.subplot2grid((2, 6), (0, 2), colspan=2)
-    ax3 = plt.subplot2grid((2, 6), (0, 4), colspan=2)
-
-    ax4 = plt.subplot2grid((2, 6), (1, 0), colspan=2)
-    ax5 = plt.subplot2grid((2, 6), (1, 2), colspan=2)
-    ax6 = plt.subplot2grid((2, 6), (1, 4), colspan=2)
-
-    # Plot AE with Direction Loss
-    ae_dl_fig, ae_dl_ax = figures_and_axes[0]
-    for line in ae_dl_ax.lines:
+    for line in SLOPE_ax.lines:
         ax1.plot(line.get_xdata(), line.get_ydata(), color=line.get_color(), marker=line.get_marker())
     ax1.set_xlabel('Age')
     ax1.set_ylabel('Pseudotime')
-    ax1.set_title('Slope')
-
-    # Plot AE without Direction Loss
-    ae_ndl_fig, ae_ndl_ax = figures_and_axes[1] 
-    for line in ae_ndl_ax.lines:
+    ax1.set_title('SLOPE')
+    
+    Autoencoder_fig, Autoencoder_ax = figures_and_axes[1]
+    for line in Autoencoder_ax.lines:
         ax2.plot(line.get_xdata(), line.get_ydata(), color=line.get_color(), marker=line.get_marker())
     ax2.set_xlabel('Age')
     ax2.set_ylabel('Pseudotime')
-    ax2.set_title('Slope Without Direction Loss')
-
-    # Plot LNE
-    ae_LNE_fig, ae_LNE_ax = figures_and_axes[2]
-    for line in ae_LNE_ax.lines:
+    ax2.set_title('Autoencoder')
+    
+    mlp_fig, mlp_ax = figures_and_axes[2]
+    for line in mlp_ax.lines:
         ax3.plot(line.get_xdata(), line.get_ydata(), color=line.get_color(), marker=line.get_marker())
+    ax3.set_title('Logistic Regression')
     ax3.set_xlabel('Age')
-    ax3.set_ylabel('Pseudotime')
-    ax3.set_title('LNE')
-
-    # Plot Logistic Regression
-    lr_fig, lr_ax = figures_and_axes[3]
-    for line in lr_ax.lines:
+    ax3.set_ylabel('Logit')
+    
+    en_fig, en_ax = figures_and_axes[3]
+    for line in en_ax.lines:
         ax4.plot(line.get_xdata(), line.get_ydata(), color=line.get_color(), marker=line.get_marker())
+    ax4.set_title('Elastic Net')
     ax4.set_xlabel('Age')
     ax4.set_ylabel('Logit')
-    ax4.set_title('Logistic Regression')
-
-    # Plot Elastic Net
-    en_fig, en_ax = figures_and_axes[4]
-    for line in en_ax.lines:
+    
+    lr_fig, lr_ax = figures_and_axes[4]
+    for line in lr_ax.lines:
         ax5.plot(line.get_xdata(), line.get_ydata(), color=line.get_color(), marker=line.get_marker())
+    ax5.set_title('MLP')
     ax5.set_xlabel('Age')
     ax5.set_ylabel('Logit')
-    ax5.set_title('Elastic Net')
-
-    # Plot MLP
-    mlp_fig, mlp_ax = figures_and_axes[5]
-    for line in mlp_ax.lines:
-        ax6.plot(line.get_xdata(), line.get_ydata(), color=line.get_color(), marker=line.get_marker())
-    ax6.set_xlabel('Age')
-    ax6.set_ylabel('Logit')
-    ax6.set_title('MLP')
-
+    
+    fig.delaxes(plt.subplot2grid((2, 6), (0, 0))) 
+    fig.delaxes(plt.subplot2grid((2, 6), (0, 5)))  
+    
     fig.suptitle('Subject Progression over Age', fontsize=16, fontweight='bold', y=1.05, ha='center')
-
+    
     plt.tight_layout()
     plt.show()
 
@@ -150,26 +140,14 @@ def plot_violation_metrics(results, thresholds, figsize=(15, 8)):
     plt.show()
 
 
-def plot_umap_embeddings(data_2d_umap_train_dl, data_2d_umap_test_dl, y_train, y_test, title):
-    """
-    Plot UMAP embeddings for train and test datasets with subplots.
+def plot_umap_embeddings(train_data, test_data, y_train, y_test, title):
 
-    Parameters:
-    - data_2d_umap_train_dl: DataFrame or array-like, 2D UMAP embeddings for train set (2 columns).
-    - data_2d_umap_test_dl: DataFrame or array-like, 2D UMAP embeddings for test set (2 columns).
-    - y_train: Labels for the train set.
-    - y_test: Labels for the test set.
-    - title: Title for the entire plot.
-
-    Returns:
-    None
-    """
     fig, axes = plt.subplots(1, 2, figsize=(12, 6))
     fig.suptitle(title, fontsize=16, fontweight="bold")
 
     sns.scatterplot(
-        x=data_2d_umap_train_dl["UMAP1"],
-        y=data_2d_umap_train_dl["UMAP2"],
+        x=train_data["UMAP1"],
+        y=train_data["UMAP2"],
         hue=y_train,
         palette="viridis",
         ax=axes[0]
@@ -180,8 +158,8 @@ def plot_umap_embeddings(data_2d_umap_train_dl, data_2d_umap_test_dl, y_train, y
     axes[0].legend(title="Labels", loc="best", fontsize="small")
 
     sns.scatterplot(
-        x=data_2d_umap_test_dl["UMAP1"],
-        y=data_2d_umap_test_dl["UMAP2"],
+        x=test_data["UMAP1"],
+        y=test_data["UMAP2"],
         hue=y_test,
         palette="viridis",
         ax=axes[1],
@@ -193,4 +171,3 @@ def plot_umap_embeddings(data_2d_umap_train_dl, data_2d_umap_test_dl, y_train, y
 
     plt.tight_layout(rect=[0, 0, 1, 0.95])  
     plt.show()
-
