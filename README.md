@@ -1,7 +1,7 @@
 # SLOPE: Learning the Irreversible Progression Trajectory of Alzheimer’s Disease  
 
 ## Overview  
-SLOPE (Semi-supervised Learning of Progressive Embeddings) is a novel machine learning framework designed to model the irreversible progression of Alzheimer's Disease (AD). Unlike traditional models that produce fluctuating risk predictions, SLOPE enforces a monotonic increase in predicted disease risk, ensuring biologically meaningful and consistent disease trajectories.  
+SLOPE (Supervised Learning of Progressive Embeddings) is a novel machine learning framework designed to model the irreversible progression of Alzheimer's Disease (AD). Unlike traditional models that produce fluctuating risk predictions, SLOPE enforces a monotonic increase in predicted disease risk, ensuring biologically meaningful and consistent disease trajectories.  
 
 ## Key Features  
 - **Monotonic Disease Progression**: Enforces directional loss to maintain increasing disease severity over time.  
