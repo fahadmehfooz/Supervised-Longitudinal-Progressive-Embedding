@@ -87,9 +87,9 @@ SLOPE provides a robust approach to modeling Alzheimer’s Disease progression, 
 ```
 Supervised-Longitudinal-Progressive-Embedding/
 │-- Supervised_Longitudinal_Progressive_Embedding.ipynb  # Main notebook
-│-- modules/  # Contains all core model and data processing modules
-│-- Model_objects/  # Stores trained model weights and objects
-│-- Embeddings/  # Stores UMAP embedding files for slope, autoencoder, and supervised models
-│-- Temp_Files/  # Temporary storage for pseudotime files and generated images (must exist)
+│-- Modules/  # Contains all core model and data processing modules
+│-- Model Objects/  # Stores trained model weights and objects
+│-- Embeddings/  # Stores UMAP embedding files for slope, autoencoder, and supervised models. You need to place them here, as R-Studio is working locally. And python is working on google colab.
+│-- Temp Files/  # Temporary storage for pseudotime files and generated images (must exist)
 ```
 
