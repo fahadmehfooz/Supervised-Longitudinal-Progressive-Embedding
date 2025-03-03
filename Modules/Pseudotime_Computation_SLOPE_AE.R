@@ -5,11 +5,18 @@ library(RColorBrewer)
 library(slingshot)
 library(fields)
 
+# Working directory needs to be ->/Users/fahadmehfooz/Desktop/Supervised-Longitudinal-Progressive-Embedding/Modules
+# Ensure you follow our structure
+# Set working directory
+
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))  
+print(getwd())  
+
 run_pseudotime_analysis <- function(train_umap_path, test_umap_path, output_prefix) {
 
   plot_width <- 2.5
   plot_height <- 2
-  output_dir <- "/Users/fahadmehfooz/Desktop/AE/SLOPE/Temp Files/"
+  output_dir <- "../../Supervised-Longitudinal-Progressive-Embedding/Temp Files/"
   
   standard_theme <- theme_minimal() +
     theme(
@@ -279,16 +286,20 @@ run_pseudotime_analysis <- function(train_umap_path, test_umap_path, output_pref
                 )
 }
 
+
+data_dir <- "../../Supervised-Longitudinal-Progressive-Embedding/Embeddings"
+
 # For SLOPE analysis
 slope_results <- run_pseudotime_analysis(
-  "/Users/fahadmehfooz/Downloads/SLOPE_train_umap.csv",
-  "/Users/fahadmehfooz/Downloads/SLOPE_test_umap.csv",
+  file.path(data_dir, "SLOPE_train_umap.csv"), 
+  file.path(data_dir, "SLOPE_test_umap.csv"),
   "SLOPE"
 )
 
+
 # For Autoencoder analysis
 ae_results <- run_pseudotime_analysis(
-  "/Users/fahadmehfooz/Downloads/Autoencoder_train_umap.csv",
-  "/Users/fahadmehfooz/Downloads/Autoencoder_test_umap.csv",
+  file.path(data_dir, "Autoencoder_train_umap.csv"), 
+  file.path(data_dir, "Autoencoder_test_umap.csv"),
   "Autoencoder"
 )

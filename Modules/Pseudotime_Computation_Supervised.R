@@ -5,11 +5,14 @@ library(RColorBrewer)
 library(slingshot)
 library(fields)
 
-plot_width <- 2.5
-plot_height <- 2
-output_dir <- "/Users/fahadmehfooz/Desktop/AE/SLOPE/Temp Files/"
+# Working directory needs to be ->/Users/fahadmehfooz/Desktop/Supervised-Longitudinal-Progressive-Embedding/Modules
+# Ensure you follow our structure
+# Set working directory
 
-standard_theme <- theme_minimal() +
+output_dir <- "../../Supervised-Longitudinal-Progressive-Embedding/Temp Files"
+
+# Standard plot theme
+standard_theme <- theme_minimal() + 
   theme(
     plot.title = element_text(hjust = 0.5, size = 8, face = "bold"),
     axis.title = element_text(size = 8, face = "bold"),
@@ -27,23 +30,24 @@ standard_theme <- theme_minimal() +
     plot.margin = margin(10, 10, 10, 10, "pt")
   )
 
-
+# Function to prepare data
 prepare_data <- function(df) {
-  df$DXGrp <- factor(df$DXGrp,
-                     levels = c(1, 2, 3, 4),
-                     labels = c("CN", "EMCI", "LMCI", "AD"))
+  df$DXGrp <- factor(df$DXGrp, levels = c(1, 2, 3, 4), labels = c("CN", "EMCI", "LMCI", "AD"))
   df$DX <- df$DXGrp
-  df
+  return(df)
 }
 
-train_lr <- prepare_data(read.csv("/Users/fahadmehfooz/Downloads/train_df_lr.csv"))
-test_lr <- prepare_data(read.csv("/Users/fahadmehfooz/Downloads/test_df_lr.csv"))
-train_mlp <- prepare_data(read.csv("/Users/fahadmehfooz/Downloads/train_df_mlp.csv"))
-test_mlp <- prepare_data(read.csv("/Users/fahadmehfooz/Downloads/test_df_mlp.csv"))
-train_en <- prepare_data(read.csv("/Users/fahadmehfooz/Downloads/train_df_en.csv"))
-test_en <- prepare_data(read.csv("/Users/fahadmehfooz/Downloads/test_df_en.csv"))
+# Read CSV files using relative paths
+data_dir <- "../../Supervised-Longitudinal-Progressive-Embedding/Embeddings"
 
-# Consolidated boxplot function matching first script's style
+train_lr <- prepare_data(read.csv(file.path(data_dir, "train_df_lr.csv")))
+test_lr <- prepare_data(read.csv(file.path(data_dir, "test_df_lr.csv")))
+train_mlp <- prepare_data(read.csv(file.path(data_dir, "train_df_mlp.csv")))
+test_mlp <- prepare_data(read.csv(file.path(data_dir, "test_df_mlp.csv")))
+train_en <- prepare_data(read.csv(file.path(data_dir, "train_df_en.csv")))
+test_en <- prepare_data(read.csv(file.path(data_dir, "test_df_en.csv")))
+
+# Function to generate boxplots
 generate_model_boxplot <- function(data, model_type, dataset_type) {
   my_colors <- c("CN" = "#F8766D", "EMCI" = "#7CAE00", "LMCI" = "#00BFC4", "AD" = "#C77CFF")
   my_comparisons <- list(c("CN", "EMCI"), c("EMCI", "LMCI"), c("LMCI", "AD"))
@@ -65,9 +69,10 @@ generate_model_boxplot <- function(data, model_type, dataset_type) {
     guides(fill = guide_legend(override.aes = list(color = NA)))
   
   filename <- paste0("Plot_", dataset_type, "_boxplot_", tolower(model_type), ".png")
-  ggsave(file.path(output_dir, filename), p, width = plot_width, height = plot_height, dpi = 300)
+  ggsave(file.path(output_dir, filename), p, width = 2.5, height = 2, dpi = 300)
 }
 
+# Generate boxplots
 generate_model_boxplot(train_lr, "LR", "train")
 generate_model_boxplot(test_lr, "LR", "test")
 generate_model_boxplot(train_mlp, "MLP", "train")
