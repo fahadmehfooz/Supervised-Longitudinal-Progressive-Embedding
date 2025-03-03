@@ -5,7 +5,7 @@ library(RColorBrewer)
 library(slingshot)
 library(fields)
 
-# Working directory needs to be ->/Users/fahadmehfooz/Desktop/Supervised-Longitudinal-Progressive-Embedding/Modules
+# Working directory needs to be ->/Supervised-Longitudinal-Progressive-Embedding/Modules
 # Ensure you follow our structure
 # Set working directory
 
