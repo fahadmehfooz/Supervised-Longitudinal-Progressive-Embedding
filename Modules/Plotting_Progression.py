@@ -43,7 +43,6 @@ def plot_subject_progression(df, model_name, y_label, figsize):
     return fig, ax
 
 def plot_embedding_results(filename, title="Image", figsize = (8, 6)):
-    """Load and display an image using matplotlib."""
     img = mpimg.imread(filename)
     plt.figure(figsize=figsize)
     plt.imshow(img)

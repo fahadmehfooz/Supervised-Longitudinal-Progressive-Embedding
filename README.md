@@ -23,6 +23,7 @@ The model is trained on the **Alzheimer’s Disease Neuroimaging Initiative (ADN
 
 ### 2. Model Components
 - **Autoencoder**: Compresses input features into meaningful latent representations.
+- **Triplet Loss**: Encourages similarity within the same class and separation between different classes.
 - **Directional Loss**: Enforces monotonicity in disease progression.
 
 ### 3. Loss Function
