@@ -42,17 +42,13 @@ def plot_subject_progression(df, model_name, y_label, figsize):
     plt.close(fig) 
     return fig, ax
 
-def plot_embedding_results(image_paths, title, figsize):
-
-    fig, axes = plt.subplots(1, len(image_paths), figsize=figsize)
-
-    for ax, img_path in zip(axes, image_paths):
-        img = mpimg.imread(img_path)
-        ax.imshow(img)
-        ax.axis('off')  
-
-    fig.suptitle(title, fontsize=16, fontweight='bold')
-    plt.tight_layout()
+def plot_embedding_results(filename, title="Image", figsize = (8, 6)):
+    """Load and display an image using matplotlib."""
+    img = mpimg.imread(filename)
+    plt.figure(figsize=figsize)
+    plt.imshow(img)
+    plt.axis("off")  
+    plt.title(title, fontweight="bold")
     plt.show()
 
 

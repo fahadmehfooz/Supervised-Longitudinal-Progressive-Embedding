@@ -1,17 +1,13 @@
 library(ggplot2)
 library(dplyr)
 library(ggpubr)
-library(RColorBrewer)
-library(slingshot)
-library(fields)
+library(grid)
 
 # Working directory needs to be ->/Supervised-Longitudinal-Progressive-Embedding/Modules
 # Ensure you follow our structure
 # Set working directory
 
-output_dir <- "../../Supervised-Longitudinal-Progressive-Embedding/Temp Files"
 
-# Standard plot theme
 standard_theme <- theme_minimal() + 
   theme(
     plot.title = element_text(hjust = 0.5, size = 8, face = "bold"),
@@ -30,54 +26,65 @@ standard_theme <- theme_minimal() +
     plot.margin = margin(10, 10, 10, 10, "pt")
   )
 
-# Function to prepare data
-prepare_data <- function(df) {
-  df$DXGrp <- factor(df$DXGrp, levels = c(1, 2, 3, 4), labels = c("CN", "EMCI", "LMCI", "AD"))
-  df$DX <- df$DXGrp
-  return(df)
-}
 
-# Read CSV files using relative paths
-data_dir <- "../../Supervised-Longitudinal-Progressive-Embedding/Embeddings"
-
-train_lr <- prepare_data(read.csv(file.path(data_dir, "train_df_lr.csv")))
-test_lr <- prepare_data(read.csv(file.path(data_dir, "test_df_lr.csv")))
-train_mlp <- prepare_data(read.csv(file.path(data_dir, "train_df_mlp.csv")))
-test_mlp <- prepare_data(read.csv(file.path(data_dir, "test_df_mlp.csv")))
-train_en <- prepare_data(read.csv(file.path(data_dir, "train_df_en.csv")))
-test_en <- prepare_data(read.csv(file.path(data_dir, "test_df_en.csv")))
-
-# Function to generate boxplots
 generate_model_boxplot <- function(data, model_type, dataset_type) {
   my_colors <- c("CN" = "#F8766D", "EMCI" = "#7CAE00", "LMCI" = "#00BFC4", "AD" = "#C77CFF")
   my_comparisons <- list(c("CN", "EMCI"), c("EMCI", "LMCI"), c("LMCI", "AD"))
   
-  p <- ggboxplot(data, x = "DX", y = "Pseudotime_Normalized",
-                 fill = "DX", outlier.size = 0.001) +
+  ggboxplot(data, x = "DX", y = "Pseudotime_Normalized",
+            fill = "DX", outlier.size = 0.001) +
     stat_compare_means(comparisons = my_comparisons,
                        aes(label = ..p.signif..),
                        method = "t.test", size = 3.5,
                        step.increase = 0.15, tip.length = 0.01) +
-    labs(title = "Pseudotime Vs Diagnosis Group",
-         y = "Pseudotime", x = "Diagnosis Groups") +
-    labs(fill = "Diagnosis\nGroups") +
-    scale_fill_manual(values = my_colors) +
+    labs(title = paste0( model_type), 
+         y = NULL, x = "Diagnosis Groups") + 
     scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
     standard_theme +
-    theme(legend.position = "right",
-          plot.title = element_text(hjust = 0.5)) +
-    guides(fill = guide_legend(override.aes = list(color = NA)))
+    theme(
+      panel.grid = element_blank(),
+      axis.text.x = element_text(color = "black", size = 8, face = "bold", angle = 45),
+      axis.text.y = element_text(color = "black", size = 8, face = "bold"),
+      plot.margin = margin(10, 10, 10, 10, "pt"),
+      legend.position = "none"
+    )
   
-  filename <- paste0("Plot_", dataset_type, "_boxplot_", tolower(model_type), ".png")
-  ggsave(file.path(output_dir, filename), p, width = 2.5, height = 2, dpi = 300)
 }
 
-# Generate boxplots
-generate_model_boxplot(train_lr, "LR", "train")
-generate_model_boxplot(test_lr, "LR", "test")
-generate_model_boxplot(train_mlp, "MLP", "train")
-generate_model_boxplot(test_mlp, "MLP", "test")
-generate_model_boxplot(train_en, "EN", "train")
-generate_model_boxplot(test_en, "EN", "test")
+plot_objects <- list(
+  train_lr = generate_model_boxplot(train_lr, "Logistic Regression", "Train"),
+  train_en = generate_model_boxplot(train_en, "Elastic Net", "Train"),
+  train_mlp = generate_model_boxplot(train_mlp, "MLP", "Train"),
+  test_lr = generate_model_boxplot(test_lr, "Logistic Regression", "Test"),
+  test_en = generate_model_boxplot(test_en, "Elastic Net", "Test"),
+  test_mlp = generate_model_boxplot(test_mlp, "MLP", "Test")
+)
 
-graphics.off()
+combined_train <- ggarrange(
+  plot_objects$train_lr,
+  plot_objects$train_en + theme(axis.text.y = element_blank()),
+  plot_objects$train_mlp + theme(axis.text.y = element_blank()),
+  nrow = 1,
+  labels = c("(a)", "(b)", "(c)"),
+  font.label = list(size = 8, face = "bold"),
+  legend = "none"
+) %>% annotate_figure(left = textGrob("Pseudotime", rot = 90, 
+                                      gp = gpar(fontsize = 8, fontface = "bold")))
+
+
+combined_test <- ggarrange(
+  plot_objects$test_lr,
+  plot_objects$test_en + theme(axis.text.y = element_blank()),
+  plot_objects$test_mlp + theme(axis.text.y = element_blank()),
+  nrow = 1,
+  labels = c("(a)", "(b)", "(c)"),
+  font.label = list(size = 8, face = "bold"),
+  legend = "none"
+) %>% annotate_figure(left = textGrob("Pseudotime", rot = 90,
+                                      gp = gpar(fontsize = 10, fontface = "bold")))
+
+ggsave(file.path(output_dir, "Supervised_train_plots.png"), combined_train,
+       width = 5, height = 2, dpi = 300, bg = "white")
+
+ggsave(file.path(output_dir, "Supervised_test_plots.png"), combined_test,
+       width = 5, height = 2, dpi = 300, bg = "white")

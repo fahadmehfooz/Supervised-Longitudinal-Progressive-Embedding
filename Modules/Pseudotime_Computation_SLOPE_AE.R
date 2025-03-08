@@ -4,6 +4,11 @@ library(ggpubr)
 library(RColorBrewer)
 library(slingshot)
 library(fields)
+library(cowplot)
+library(grid)
+library(gridExtra)
+library(png)
+
 
 # Working directory needs to be ->/Supervised-Longitudinal-Progressive-Embedding/Modules
 # Ensure you follow our structure
@@ -12,20 +17,24 @@ library(fields)
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))  
 print(getwd())  
 
+output_dir <- "../../Supervised-Longitudinal-Progressive-Embedding/Temp Files/"
+
 run_pseudotime_analysis <- function(train_umap_path, test_umap_path, output_prefix) {
 
-  plot_width <- 2.5
-  plot_height <- 2
+  plot_width <- 2
+  plot_height <-2
   output_dir <- "../../Supervised-Longitudinal-Progressive-Embedding/Temp Files/"
+  
+  legend_position = "bottom"
   
   standard_theme <- theme_minimal() +
     theme(
-      plot.title = element_text(hjust = 1, size = 8, face = "bold"),
-      axis.title = element_text(size = 8, face = "bold"), 
+      plot.title = element_text(hjust = 0.5, size = 8, face = "bold"),
+      axis.title = element_text(size = 8, face = "bold"),
       axis.text = element_text(size = 8),
       legend.title = element_text(size = 8, face = "bold"),
-      legend.text = element_text(size = 8, face = "bold"),
-      legend.position = "right",
+      legend.text = element_text(size = 8),
+      legend.position = "bottom", 
       legend.key.width = unit(0.1, "cm"),
       legend.key.height = unit(0.2, "cm"),
       axis.line.x = element_line(color = "black", linewidth = 0.1),
@@ -175,19 +184,36 @@ run_pseudotime_analysis <- function(train_umap_path, test_umap_path, output_pref
                   p <- ggplot() +
                     coord_cartesian(xlim = umap1_limits, ylim = umap2_limits)
                   
-                  if (is_categorical) {
+                  if (!is_categorical) {
+                    p <- p +
+                      geom_point(data = background_data, aes(UMAP1, UMAP2), color = "gray80", alpha = 0.3, size = 0.8) +
+                      geom_point(data = highlight_data, aes(UMAP1, UMAP2, color = !!sym(color_by)), alpha = 0.9, size = 1.2) +
+                      scale_color_gradientn(
+                        colors = colors, 
+                        name = "Staging score",
+                        limits = c(0, 1),
+                        breaks = c(0, 1),
+                        labels = c("0", "1")
+                      ) +
+                      guides(color = guide_colorbar(
+                        ticks = FALSE,
+                        frame.colour = NA, 
+                        title.position = "top",
+                        title.hjust = 0.5,
+                        direction = "horizontal",
+                        barwidth = unit(2, "cm"),
+                        barheight = unit(0.2, "cm")
+                      ))
+                  }
+                  
+                  else {
                     p <- p +
                       geom_point(data = background_data, aes(UMAP1, UMAP2), color = "gray80", alpha = 0.3, size = 0.8) +
                       geom_point(data = highlight_data, aes(UMAP1, UMAP2, color = !!sym(color_by)), alpha = 0.9, size = 1.2) +
                       scale_color_manual(
                         values = c("CN" = "#F8766D", "EMCI" = "#7CAE00", "LMCI" = "#00BFC4", "AD" = "#C77CFF"),
-                        name = "Diagnosis\nGroup"
+                        name = NULL
                       )
-                  } else {
-                    p <- p +
-                      geom_point(data = background_data, aes(UMAP1, UMAP2), color = "gray80", alpha = 0.3, size = 0.8) +
-                      geom_point(data = highlight_data, aes(UMAP1, UMAP2, color = !!sym(color_by)), alpha = 0.9, size = 1.2) +
-                      scale_color_gradientn(colors = colors, name = "Pseudotime\nStaging Score", limits = c(0, 1))
                   }
                   
                   p <- p +
@@ -203,18 +229,40 @@ run_pseudotime_analysis <- function(train_umap_path, test_umap_path, output_pref
                       panel.grid = element_blank(),
                       text = element_text(color = "black"),
                       axis.text = element_text(color = "black"),
-                      legend.position = "right",
                       legend.key.size = unit(0.3, "cm"),
                       legend.spacing = unit(0.1, "cm"),
-                      legend.margin = margin(0, 0, 0, 0)
+                      legend.margin = margin(0, 0, 0, 0),
+                      legend.box.margin = margin(-10, 0, 0, 0),
+                      legend.justification = "center"
                     )
+                  
+                  if (is_categorical) {
+                    p <- p + theme(
+                      legend.direction = "vertical",
+                      legend.position = c(0.5, 0.2),  
+                      legend.title = element_text(size = 8, face = "bold"),
+                      legend.text = element_text(size = 8, face = "bold")
+                    )
+                  } else {
+                    p <- p + theme(
+                      legend.direction = "horizontal",
+                      legend.position = c(0.5, 0.1), 
+                      legend.title.position = "top",
+                      legend.title = element_text(size = 8, face = "bold"),
+                      legend.text = element_text(size = 8, face = "bold"),
+                      legend.box = "horizontal",
+                      legend.box.just = "center",
+                      legend.key.width = unit(0.5, "cm"),
+                      legend.key.height = unit(0.2, "cm"),
+                      
+                    )
+                  }                  
                   
                   file_path <- paste0(output_dir, output_prefix, "_", file_suffix)
                   ggsave(file_path, p, width = plot_width, height = plot_height, dpi = 300)
                   return(file_path)
-                }
-                
-                # ----- Generate All Plots -----
+                }                
+                # ----- Generating All Plots -----
                 generated_files <- list()
                 
                 # Training Plots
@@ -239,30 +287,28 @@ run_pseudotime_analysis <- function(train_umap_path, test_umap_path, output_pref
                 generate_boxplot <- function(data, file_suffix) {
                   my_comparisons <- list(c("CN", "EMCI"), c("EMCI", "LMCI"), c("LMCI", "AD"))
                   
-                  p <- ggboxplot(data, x = "DX", y = "Pseudotime_Normalized",
-                                 fill = "DX", outlier.size = 0.001) +
+                  p<- ggboxplot(data, x = "DX", y = "Pseudotime_Normalized",
+                            fill = "DX", outlier.size = 0.001) +
                     stat_compare_means(comparisons = my_comparisons,
                                        aes(label = ..p.signif..),
                                        method = "t.test", size = 3.5,
                                        step.increase = 0.15, tip.length = 0.01) +
-                    labs(title = "Pseudotime Vs Diagnosis Group",
-                         y = "Pseudotime", x = "Diagnosis Groups") +
-                    labs(fill = "Diagnosis\nGroups") +
+                    labs(title = "Pseudotime Vs\nDiagnosis Group", y = "Pseudotime", x = "Diagnosis Groups") +
                     scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
                     standard_theme +
                     theme(
                       panel.grid = element_blank(),
-                      axis.text.x = element_text(angle = 45, hjust = 1, color = "black", size = 8, face = "bold"), # Explicit black color
-                      axis.text.y = element_text(color = "black", size = 8, face = "bold"), # Explicit black color
-                      plot.title = element_text(hjust = 0.5),
-                      plot.margin = margin(10, 10, 10, 10, "pt")
-                    ) +
-                    guides(color = "none", fill = guide_legend(override.aes = list(color = NA)))
+                      axis.text.x = element_text(color = "black", size = 8, face = "bold", angle = 45),
+                      axis.text.y = element_text(color = "black", size = 8, face = "bold"),
+                      plot.margin = margin(10, 10, 10, 10, "pt"),
+                      legend.position = "none"
+                    )
                   
                   file_path <- paste0(output_dir, output_prefix, "_", file_suffix)
                   ggsave(file_path, p, width = plot_width, height = plot_height, dpi = 300)
                   file_path
                 }
+                
                 
                 generated_files$train_boxplot <- generate_boxplot(Training_set, "Plot3_train_boxplot.png")
                 generated_files$test_boxplot <- generate_boxplot(Testing_set, "Plot3_test_boxplot.png")
@@ -303,3 +349,72 @@ ae_results <- run_pseudotime_analysis(
   file.path(data_dir, "Autoencoder_test_umap.csv"),
   "Autoencoder"
 )
+
+combine_plots <- function(model_name, data_type) {
+  # data_type should be either "train" or "test"
+  
+  plot1_path <- paste0(output_dir, model_name, "_Plot1_", data_type, "_pseudotime.png")
+  plot2_path <- paste0(output_dir, model_name, "_Plot2_", data_type, "_diagnosis.png")
+  plot3_path <- paste0(output_dir, model_name, "_Plot3_", data_type, "_boxplot.png")
+  
+  plot_width <- 2
+  plot_height <- 2
+  
+  output_path <- paste0(output_dir, model_name, "_", data_type, "_plots.png")
+  png(output_path, width = plot_width * 3, height = plot_height, units = "in", res = 300)
+  
+  grid.newpage()
+  pushViewport(viewport(layout = grid.layout(1, 3)))
+  
+  # Plot 1
+  pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 1))
+  img1 <- readPNG(plot1_path)
+  grid.raster(img1, width = unit(1, "npc"), height = unit(1, "npc"))
+  grid.text("(a)", x = unit(0.05, "npc"), y = unit(0.95, "npc"),
+            just = c("left", "top"), gp = gpar(fontface = "bold", fontsize = 7))
+  popViewport()
+  
+  # Plot 2
+  pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 2))
+  img2 <- readPNG(plot2_path)
+  grid.raster(img2, width = unit(1, "npc"), height = unit(1, "npc"))
+  grid.text("(b)", x = unit(0.05, "npc"), y = unit(0.95, "npc"),
+            just = c("left", "top"), gp = gpar(fontface = "bold", fontsize = 7))
+  popViewport()
+  
+  # Plot 3
+  pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 3))
+  img3 <- readPNG(plot3_path)
+  grid.raster(img3, width = unit(1, "npc"), height = unit(1, "npc"))
+  grid.text("(c)", x = unit(0.05, "npc"), y = unit(0.95, "npc"),
+            just = c("left", "top"), gp = gpar(fontface = "bold", fontsize = 7))
+  popViewport()
+  
+  dev.off()
+  
+  return(output_path)
+}
+
+# Replace the existing combine_test_plots function calls with these:
+if (!requireNamespace("png", quietly = TRUE)) {
+  install.packages("png")
+}
+
+slope_test_combined <- combine_plots("SLOPE", "test")
+slope_train_combined <- combine_plots("SLOPE", "train")
+
+autoencoder_test_combined <- combine_plots("Autoencoder", "test")
+autoencoder_train_combined <- combine_plots("Autoencoder", "train")
+
+file.remove(paste0(output_dir, "SLOPE_Plot1_train_pseudotime.png"))
+file.remove(paste0(output_dir, "SLOPE_Plot2_train_diagnosis.png"))
+file.remove(paste0(output_dir, "SLOPE_Plot3_train_boxplot.png"))
+file.remove(paste0(output_dir, "SLOPE_Plot1_test_pseudotime.png"))
+file.remove(paste0(output_dir, "SLOPE_Plot2_test_diagnosis.png"))
+file.remove(paste0(output_dir, "SLOPE_Plot3_test_boxplot.png"))
+file.remove(paste0(output_dir, "Autoencoder_Plot1_train_pseudotime.png"))
+file.remove(paste0(output_dir, "Autoencoder_Plot2_train_diagnosis.png"))
+file.remove(paste0(output_dir, "Autoencoder_Plot3_train_boxplot.png"))
+file.remove(paste0(output_dir, "Autoencoder_Plot1_test_pseudotime.png"))
+file.remove(paste0(output_dir, "Autoencoder_Plot2_test_diagnosis.png"))
+file.remove(paste0(output_dir, "Autoencoder_Plot3_test_boxplot.png"))
